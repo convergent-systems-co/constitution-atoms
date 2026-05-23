@@ -1,0 +1,51 @@
+# ATOMS.yml — catalog manifest for constitution-atoms
+#
+# Conforms to atoms-spec/v1.1.0.
+# See https://github.com/convergent-systems-co/atoms-spec for the canonical schema.
+
+spec_version: atoms-spec/v1.1.0
+name: constitution-atoms
+version: 0.1.0
+canonical_domain: constitution-atoms.com
+federation: convergent-systems.co
+
+purpose: |
+  Organizational constitutions canonicalized — bylaws, charters, mission
+  statements, principle hierarchies, value declarations — composed into typed
+  governance corpora that downstream policy-atoms and compliance-atoms
+  reference.
+
+atom_types:
+  - charter
+  - bylaw
+  - principle
+  - mission-statement
+  - value-declaration
+
+composition_type: constitutions
+composition_dir: constitutions/
+
+signing:
+  required_algorithms: ["ml-dsa-65"]
+  accepted_algorithms: ["ml-dsa-65", "ml-dsa-44"]
+  quorum_rules:
+    default: "1 of role:catalog-maintainer"
+    "governance/*": "1 of role:catalog-maintainer + 1 of role:ratifier"
+
+lifecycle:
+  current: "bootstrap"
+
+licensing:
+  code: "Apache-2.0"
+  data: "CC-BY-4.0"
+
+steward: convergent-systems-co
+infrastructure_operator: convergent-systems-co
+
+runtime_consumers:
+  - aish
+  - olympus
+
+maintainers:
+  - name: Convergent Systems
+    contact: maintainers@convergent-systems.co

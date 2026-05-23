@@ -1,0 +1,15 @@
+---
+import Base from "../../layouts/Base.astro";
+import CompositionCard from "../../components/CompositionCard.astro";
+import catalog from "../../../public/exports/catalog.json";
+
+const compositions = catalog.compositions.slice().sort((a: any, b: any) => a.id.localeCompare(b.id));
+---
+<Base title="Agents" description="Agent compositions — assembled personas, tools, capabilities, role boundaries, isolation.">
+  <h1>Agents</h1>
+  <p>{compositions.length} agent composition{compositions.length === 1 ? "" : "s"} — each assembles atoms into a complete agent definition.</p>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr)); gap: 1rem; margin-top: 2rem;">
+    {compositions.map((c: any) => <CompositionCard composition={c} />)}
+  </div>
+</Base>

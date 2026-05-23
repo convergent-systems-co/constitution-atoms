@@ -1,0 +1,101 @@
+---
+import Base from "../../../layouts/Base.astro";
+import catalog from "../../../../public/exports/catalog.json";
+
+export function getStaticPaths() {
+  return catalog.atoms.map((atom: any) => ({
+    params: { type: atom.type, id: atom.id },
+    props: { atom },
+  }));
+}
+
+const { atom } = Astro.props;
+
+// Pick the type-specific payload
+const profile = atom.persona_profile;
+const toolSpec = atom.tool_spec;
+const capability = atom.capability;
+const boundary = atom.boundary;
+const isolation = atom.isolation;
+---
+<Base title={atom.name} description={atom.description ?? `${atom.type} atom`}>
+  <p><a href="/atoms/">← All atoms</a></p>
+  <h1>{atom.name}</h1>
+  <p style="color: var(--muted);">
+    <code>{atom.type}</code> · <code>v{atom.version}</code>
+  </p>
+
+  {atom.description && <p>{atom.description}</p>}
+
+  {atom.tags && atom.tags.length > 0 && (
+    <p>
+      Tags: {atom.tags.map((tag: string) => (
+        <span style="display: inline-block; font-size: 0.875rem; background: #f4ece4; padding: 0.125rem 0.5rem; border-radius: 0.25rem; margin-right: 0.25rem;">{tag}</span>
+      ))}
+    </p>
+  )}
+
+  {profile && (
+    <section>
+      <h2>Persona profile</h2>
+      <dl style="display: grid; grid-template-columns: max-content 1fr; gap: 0.5rem 1rem;">
+        {profile.role && (<><dt>Role</dt><dd>{profile.role}</dd></>)}
+        {profile.voice && (<><dt>Voice</dt><dd>{profile.voice}</dd></>)}
+        {profile.planner && (<><dt>Planner</dt><dd><code>{profile.planner}</code></dd></>)}
+        {profile.memory_model && (<><dt>Memory</dt><dd><code>{profile.memory_model}</code></dd></>)}
+        {profile.supervisor && (<><dt>Supervisor</dt><dd><code>{profile.supervisor}</code></dd></>)}
+        {profile.expertise && profile.expertise.length > 0 && (<><dt>Expertise</dt><dd>{profile.expertise.join(", ")}</dd></>)}
+      </dl>
+    </section>
+  )}
+
+  {toolSpec && (
+    <section>
+      <h2>Tool signature</h2>
+      <pre><code>{`function ${toolSpec.function_name}(${Object.entries(toolSpec.parameters ?? {}).map(([n, p]: [string, any]) => `${n}: ${p.type}${p.required ? "" : "?"}`).join(", ")}) → ${toolSpec.returns.type}`}</code></pre>
+      {toolSpec.summary && <p style="color: var(--muted);">{toolSpec.summary}</p>}
+      <h3>Parameters</h3>
+      <ul>
+        {Object.entries(toolSpec.parameters ?? {}).map(([name, p]: [string, any]) => (
+          <li><code>{name}</code> <em>({p.type}{p.required ? ", required" : ""})</em> — {p.description}</li>
+        ))}
+      </ul>
+      <h3>Side effects</h3>
+      <p>{(toolSpec.side_effects ?? []).map((s: string) => <code style="margin-right: 0.5rem;">{s}</code>)}</p>
+    </section>
+  )}
+
+  {capability && (
+    <section>
+      <h2>Capability</h2>
+      <dl style="display: grid; grid-template-columns: max-content 1fr; gap: 0.5rem 1rem;">
+        <dt>Grants</dt><dd>{capability.grants.map((g: string) => <code style="margin-right: 0.25rem;">{g}</code>)}</dd>
+        <dt>Elevation</dt><dd><code>{capability.elevation}</code></dd>
+        <dt>Audit</dt><dd>{capability.audit ? "yes" : "no"}</dd>
+      </dl>
+    </section>
+  )}
+
+  {boundary && (
+    <section>
+      <h2>Refusals</h2>
+      <ul>{boundary.refusals.map((r: string) => <li>{r}</li>)}</ul>
+      {boundary.escalate_to && <p>Escalate to: <code>{boundary.escalate_to}</code></p>}
+    </section>
+  )}
+
+  {isolation && (
+    <section>
+      <h2>Isolation</h2>
+      <dl style="display: grid; grid-template-columns: max-content 1fr; gap: 0.5rem 1rem;">
+        {isolation.process && (<><dt>Process</dt><dd><code>{isolation.process}</code></dd></>)}
+        {isolation.network && (<><dt>Network</dt><dd><code>{isolation.network}</code></dd></>)}
+        {isolation.filesystem && (<><dt>Filesystem</dt><dd><code>{isolation.filesystem}</code></dd></>)}
+        {isolation.scoped_paths && (<><dt>Scoped paths</dt><dd>{isolation.scoped_paths.map((p: string) => <code style="margin-right: 0.5rem;">{p}</code>)}</dd></>)}
+      </dl>
+    </section>
+  )}
+
+  <h2>Raw atom</h2>
+  <p><a href={`/atoms/${atom.type}/${atom.id}.json`}>/atoms/{atom.type}/{atom.id}.json</a> · <a href="/schemas/atom-v1.json">schema</a></p>
+</Base>

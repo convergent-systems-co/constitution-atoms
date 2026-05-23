@@ -1,0 +1,37 @@
+---
+import Base from "../layouts/Base.astro";
+---
+<Base title="How to use" description="How to consume constitution-atoms in your application.">
+  <h1>How to use constitution-atoms</h1>
+
+  <h2>Read the catalog over HTTPS</h2>
+  <p>Every artifact is served under stable URLs with correct content-types:</p>
+  <pre><code>curl https://constitution-atoms.com/exports/catalog.json
+curl https://constitution-atoms.com/atoms/persona/code-reviewer.json
+curl https://constitution-atoms.com/agents/code-reviewer.json
+curl https://constitution-atoms.com/schemas/composition-v1.json</code></pre>
+
+  <h2>Resolve an agent composition</h2>
+  <p>An agent composition lists references to atoms by URI and version. To instantiate the agent,
+  fetch each referenced atom and assemble: persona → tools → capabilities → role boundaries → isolation.</p>
+
+  <pre><code>{`// pseudo-code
+const composition = await fetch("/agents/code-reviewer.json").then(r => r.json());
+const refs = composition.references;
+const persona = await fetch(uriToUrl(refs.persona.ref)).then(r => r.json());
+const tools = await Promise.all(refs.tools.map(r => fetch(uriToUrl(r.ref)).then(r => r.json())));
+const capabilities = await Promise.all(refs.capabilities.map(r => fetch(uriToUrl(r.ref)).then(r => r.json())));
+const isolation = await fetch(uriToUrl(refs.isolation.ref)).then(r => r.json());
+const agent = compileAgent({ persona, tools, capabilities, isolation });`}</code></pre>
+
+  <h2>Compatibility rules</h2>
+  <p>Rules in <a href="/exports/catalog.json"><code>/exports/catalog.json</code></a> (under the <code>rules</code>
+  key) declare predicates over atoms. Example: <code>capability/exec-with-approval</code> requires
+  isolation in <code>{`{container-with-allowlist, ephemeral-vm, seccomp-restricted}`}</code>. A composition
+  that violates a <code>require</code>-effect rule is malformed.</p>
+
+  <h2>Cross-framework portability</h2>
+  <p>v0.1 ships the catalog and its JSON Schema; compilers to specific agent frameworks (LangChain,
+  AutoGen, CrewAI) are v0.2 work — they translate <code>tool-definition</code> atoms into the framework's
+  native tool signature, and bind <code>capability-declaration</code> atoms to the framework's permission model.</p>
+</Base>

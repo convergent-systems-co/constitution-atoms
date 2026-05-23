@@ -1,0 +1,44 @@
+---
+import Base from "../layouts/Base.astro";
+import catalog from "../../public/exports/catalog.json";
+const counts = {
+  atoms: catalog.atoms.length,
+  compositions: catalog.compositions.length,
+  rules: catalog.rules.length,
+};
+const byType: Record<string, number> = {};
+for (const a of catalog.atoms) byType[a.type] = (byType[a.type] ?? 0) + 1;
+---
+<Base title="Home" description="Agent primitives canonicalized — personas, tools, capabilities, role boundaries, isolation.">
+  <h1>constitution-atoms</h1>
+  <p style="font-size: 1.125rem; color: var(--muted); max-width: 40rem;">
+    A typed, versioned, composable library of AI-agent primitives —
+    personas, tool definitions, capability declarations, role boundaries,
+    isolation constraints — portable across LangChain, AutoGen, CrewAI,
+    Olympus, and any future agent framework.
+  </p>
+
+  <h2>Catalog at v{catalog.version}</h2>
+  <ul>
+    <li><strong>{counts.atoms}</strong> atoms across {Object.keys(byType).length} types</li>
+    <li><strong>{counts.compositions}</strong> agent compositions</li>
+    <li><strong>{counts.rules}</strong> compatibility rules</li>
+  </ul>
+
+  <h2>Atom types</h2>
+  <ul>
+    {Object.entries(byType).map(([type, n]) => (
+      <li><a href={`/atoms/?type=${type}`}>{type}</a> — {n} atoms</li>
+    ))}
+  </ul>
+
+  <h2>Civilization-grade properties</h2>
+  <ul>
+    <li><strong>Typed</strong> — every atom, composition, and rule validates against a JSON Schema.</li>
+    <li><strong>Versioned</strong> — every atom has a semver <code>version</code> field; compositions pin by version.</li>
+    <li><strong>Machine-readable</strong> — <a href="/exports/catalog.json">/exports/catalog.json</a> is the canonical manifest.</li>
+    <li><strong>Composable</strong> — compositions reference atoms by ID; references resolve in CI.</li>
+    <li><strong>Open</strong> — Apache-2.0 licensed.</li>
+    <li><strong>Durable</strong> — no external dependencies in the hot path.</li>
+  </ul>
+</Base>

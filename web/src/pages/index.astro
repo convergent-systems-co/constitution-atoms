@@ -1,6 +1,7 @@
 ---
-import Base from "../layouts/Base.astro";
 import catalog from "../../public/exports/catalog.json";
+const title = "constitution-atoms";
+const tagline = "Agent primitives canonicalized — personas, tools, capabilities, role boundaries, isolation.";
 const counts = {
   atoms: catalog.atoms.length,
   compositions: catalog.compositions.length,
@@ -9,36 +10,76 @@ const counts = {
 const byType: Record<string, number> = {};
 for (const a of catalog.atoms) byType[a.type] = (byType[a.type] ?? 0) + 1;
 ---
-<Base title="Home" description="Agent primitives canonicalized — personas, tools, capabilities, role boundaries, isolation.">
-  <h1>constitution-atoms</h1>
-  <p style="font-size: 1.125rem; color: var(--muted); max-width: 40rem;">
-    A typed, versioned, composable library of AI-agent primitives —
-    personas, tool definitions, capability declarations, role boundaries,
-    isolation constraints — portable across LangChain, AutoGen, CrewAI,
-    Olympus, and any future agent framework.
-  </p>
 
-  <h2>Catalog at v{catalog.version}</h2>
-  <ul>
-    <li><strong>{counts.atoms}</strong> atoms across {Object.keys(byType).length} types</li>
-    <li><strong>{counts.compositions}</strong> agent compositions</li>
-    <li><strong>{counts.rules}</strong> compatibility rules</li>
-  </ul>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={tagline} />
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="https://brand-atoms.com/dist/brands/atom-family/1.0.0/assets/favicon.svg" />
+    <link rel="preconnect" href="https://brand-atoms.com" />
+    <link rel="stylesheet" href="https://brand-atoms.com/dist/brands/atom-family/1.0.0/css/tokens.css" />
+    <link rel="stylesheet" href="https://brand-atoms.com/dist/brands/atom-family/1.0.0/ui/atoms-catalog.css" />
+    <style>
+      body { min-height: 100vh; }
+      .hero-mark { width: 160px; height: 160px; margin-bottom: 20px; object-fit: contain; }
+      .sidenav-wordmark { width: 140px; object-fit: contain; display: block; }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <main class="content">
+        <section class="hero">
+          <img src="https://brand-atoms.com/dist/brands/atom-family/1.0.0/assets/atom-family-icon.png" alt="atom-family" class="hero-mark" />
+          <h1>{title}</h1>
+          <p class="lede">{tagline}</p>
+        </section>
 
-  <h2>Atom types</h2>
-  <ul>
-    {Object.entries(byType).map(([type, n]) => (
-      <li><a href={`/atoms/?type=${type}`}>{type}</a> — {n} atoms</li>
-    ))}
-  </ul>
+        <p style="font-size: 1.125rem; color: var(--muted); max-width: 40rem;">
+          A typed, versioned, composable library of AI-agent primitives —
+          personas, tool definitions, capability declarations, role boundaries,
+          isolation constraints — portable across LangChain, AutoGen, CrewAI,
+          Olympus, and any future agent framework.
+        </p>
 
-  <h2>Civilization-grade properties</h2>
-  <ul>
-    <li><strong>Typed</strong> — every atom, composition, and rule validates against a JSON Schema.</li>
-    <li><strong>Versioned</strong> — every atom has a semver <code>version</code> field; compositions pin by version.</li>
-    <li><strong>Machine-readable</strong> — <a href="/exports/catalog.json">/exports/catalog.json</a> is the canonical manifest.</li>
-    <li><strong>Composable</strong> — compositions reference atoms by ID; references resolve in CI.</li>
-    <li><strong>Open</strong> — Apache-2.0 licensed.</li>
-    <li><strong>Durable</strong> — no external dependencies in the hot path.</li>
-  </ul>
-</Base>
+        <h2>Catalog at v{catalog.version}</h2>
+        <ul>
+          <li><strong>{counts.atoms}</strong> atoms across {Object.keys(byType).length} types</li>
+          <li><strong>{counts.compositions}</strong> agent compositions</li>
+          <li><strong>{counts.rules}</strong> compatibility rules</li>
+        </ul>
+
+        <h2>Atom types</h2>
+        <ul>
+          {Object.entries(byType).map(([type, n]) => (
+            <li><a href={`/atoms/?type=${type}`}>{type}</a> — {n} atoms</li>
+          ))}
+        </ul>
+
+        <h2>Civilization-grade properties</h2>
+        <ul>
+          <li><strong>Typed</strong> — every atom, composition, and rule validates against a JSON Schema.</li>
+          <li><strong>Versioned</strong> — every atom has a semver <code>version</code> field; compositions pin by version.</li>
+          <li><strong>Machine-readable</strong> — <a href="/exports/catalog.json">/exports/catalog.json</a> is the canonical manifest.</li>
+          <li><strong>Composable</strong> — compositions reference atoms by ID; references resolve in CI.</li>
+          <li><strong>Open</strong> — Apache-2.0 licensed.</li>
+          <li><strong>Durable</strong> — no external dependencies in the hot path.</li>
+        </ul>
+
+        <footer>
+          Part of the <a href="https://github.com/convergent-systems-co/atoms">atoms ecosystem</a>. Apache-2.0.
+        </footer>
+      </main>
+      <nav class="sidenav">
+        <a class="brand" href="/">
+          <img src="https://brand-atoms.com/dist/brands/atom-family/1.0.0/assets/atom-family-wordmark.png" alt="ATOMS" class="sidenav-wordmark" />
+        </a>
+        <div class="aside-meta">
+          <a class="meta-link" href="https://github.com/convergent-systems-co/constitution-atoms">github ↗</a>
+        </div>
+      </nav>
+    </div>
+  </body>
+</html>

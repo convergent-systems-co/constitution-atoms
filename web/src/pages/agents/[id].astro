@@ -5,21 +5,24 @@ import catalog from "../../../public/exports/catalog.json";
 
 export function getStaticPaths() {
   return catalog.compositions.map((composition: any) => ({
-    params: { id: composition.id },
+    params: { id: composition.id.split('/').pop() },
     props: { composition },
   }));
 }
 
 const { composition } = Astro.props;
-const refs = composition.references;
+const refs = composition.references ?? {};
 
 type Ref = { ref: string; version: string };
 const sections: Array<{ label: string; values: Ref[] }> = [
-  { label: "Persona", values: [refs.persona] },
+  ...(refs.persona ? [{ label: "Persona", values: [refs.persona] }] : []),
+  ...(refs.charters?.length ? [{ label: "Charters", values: refs.charters }] : []),
+  ...(refs.bylaws?.length ? [{ label: "Bylaws", values: refs.bylaws }] : []),
+  ...(refs.principles?.length ? [{ label: "Principles", values: refs.principles }] : []),
   { label: "Tools", values: refs.tools ?? [] },
   { label: "Capabilities", values: refs.capabilities ?? [] },
   { label: "Role boundaries", values: refs.role_boundaries ?? [] },
-  { label: "Isolation", values: [refs.isolation] },
+  ...(refs.isolation ? [{ label: "Isolation", values: [refs.isolation] }] : []),
 ];
 ---
 <Base title={composition.name} description={composition.description}>

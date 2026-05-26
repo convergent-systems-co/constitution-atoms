@@ -2,8 +2,42 @@
   "catalog": "constitution-atoms",
   "version": "0.1.0",
   "spec_version": "atoms-spec/v1.1.0",
-  "built_at": "2026-05-23T00:00:00+00:00",
-  "atoms": [],
-  "compositions": [],
+  "built_at": "2026-05-26T00:00:00+00:00",
+  "atoms": [
+    {
+      "id": "ai-governance",
+      "type": "charter",
+      "version": "0.3.0",
+      "name": "AI Governance Charter",
+      "status": "ratified",
+      "path": "atoms/charter/ai-governance.json"
+    },
+    {
+      "id": "open-source-commitment",
+      "type": "charter",
+      "version": "1.0.0",
+      "name": "Open Source Commitment Charter",
+      "status": "ratified",
+      "path": "atoms/charter/open-source-commitment.json"
+    },
+    {
+      "id": "amendment-procedure",
+      "type": "bylaw",
+      "version": "1.0.0",
+      "name": "Amendment Procedure",
+      "status": "ratified",
+      "path": "atoms/bylaw/amendment-procedure.json"
+    }
+  ],
+  "compositions": [
+    {
+      "id": "cs-ai-governance",
+      "type": "constitution",
+      "version": "0.3.0",
+      "name": "Convergent Systems AI Governance Constitution",
+      "status": "ratified",
+      "path": "constitutions/cs-ai-governance@0.3.0/composition.json"
+    }
+  ],
   "rules": []
 }

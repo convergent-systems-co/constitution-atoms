@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://constitution-atoms.com/schemas/atom-v1.json",
   "title": "constitution-atoms v1 atom",
-  "description": "A single atom in the constitution-atoms catalog. Discriminated by `type`. constitution-atoms personas overlap prompt-atoms personas but add agent-specific fields (memory, planner, supervisor).",
+  "description": "A single atom in the constitution-atoms catalog. Discriminated by `type`: charter atoms capture mission/scope/values; bylaw atoms capture procedures and quorum rules; principle, mission-statement, and value-declaration atoms capture lower-level governance building blocks.",
   "type": "object",
   "required": ["schema", "type", "id", "version", "name"],
   "additionalProperties": false,
@@ -13,93 +13,158 @@
     },
     "type": {
       "type": "string",
-      "enum": ["persona", "tool-definition", "capability-declaration", "role-boundary", "isolation-constraint"]
+      "enum": ["charter", "bylaw", "principle", "mission-statement", "value-declaration"],
+      "description": "Atom type — must match the parent directory name and a declared atomType in ATOMS.yml."
     },
-    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$" },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$",
+      "description": "Slug that matches the filename stem. Used as the last segment of the atom URI."
+    },
     "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$" },
-    "name": { "type": "string", "minLength": 1, "maxLength": 80 },
-    "description": { "type": "string", "maxLength": 500 },
-    "tags": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 40 }, "uniqueItems": true },
-
-    "persona_profile": {
-      "type": "object",
-      "description": "Only for type=persona. Agent-specific role + planner + memory shape.",
-      "additionalProperties": false,
-      "properties": {
-        "role": { "type": "string", "minLength": 1, "maxLength": 80 },
-        "expertise": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
-        "voice": { "type": "string", "maxLength": 280 },
-        "planner": { "type": "string", "enum": ["reactive", "tree-of-thoughts", "react", "plan-and-execute", "none"] },
-        "memory_model": { "type": "string", "enum": ["none", "short-term", "long-term", "vector", "scratchpad"] },
-        "supervisor": { "type": "string", "description": "Ref to an constitution-atoms persona that supervises this one, or 'none'." }
-      }
+    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "description": { "type": "string", "maxLength": 800 },
+    "effective_date": {
+      "type": "string",
+      "format": "date",
+      "description": "ISO-8601 date on which this atom takes effect."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "ratified", "amended", "superseded"],
+      "description": "Lifecycle state of this atom."
+    },
+    "authority": {
+      "type": "string",
+      "description": "Organization or entity that ratified this atom."
+    },
+    "supersedes": {
+      "description": "Atom ID this atom replaces, or null.",
+      "oneOf": [{ "type": "string" }, { "type": "null" }]
+    },
+    "references": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "description": "Informational references (URLs or atom URIs) that informed this atom."
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 60 },
+      "uniqueItems": true
     },
 
-    "tool_spec": {
+    "charter_body": {
       "type": "object",
-      "description": "Only for type=tool-definition. JSON-schema-like tool signature.",
+      "description": "Only for type=charter. Mission, vision, scope, core values, operating principles, and provisions.",
       "additionalProperties": false,
-      "required": ["function_name", "parameters", "returns", "side_effects"],
       "properties": {
-        "function_name": { "type": "string", "minLength": 1 },
-        "summary": { "type": "string", "maxLength": 280 },
-        "parameters": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "required": ["type"],
-            "properties": {
-              "type": { "type": "string", "enum": ["string", "number", "boolean", "object", "array", "null"] },
-              "description": { "type": "string" },
-              "required": { "type": "boolean" }
-            }
-          }
+        "mission": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "vision": { "type": "string", "maxLength": 500 },
+        "scope": { "type": "string", "maxLength": 800 },
+        "core_values": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
         },
-        "returns": { "type": "object", "required": ["type"], "properties": { "type": { "type": "string" }, "description": { "type": "string" } } },
-        "side_effects": { "type": "array", "items": { "type": "string", "enum": ["none", "fs-read", "fs-write", "network", "exec", "billable", "user-prompt"] }, "uniqueItems": true }
+        "operating_principles": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "provisions": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Numbered provisions of the charter."
+        }
       }
     },
 
-    "capability": {
+    "bylaw_body": {
       "type": "object",
-      "description": "Only for type=capability-declaration.",
+      "description": "Only for type=bylaw. Procedure steps, quorum rule, voting method, and amendment procedure.",
       "additionalProperties": false,
-      "required": ["grants", "elevation"],
       "properties": {
-        "grants": { "type": "array", "items": { "type": "string", "enum": ["read-files", "write-files", "exec-commands", "network", "user-prompt", "spawn-subagent", "modify-config", "delete-files"] }, "uniqueItems": true },
-        "elevation": { "type": "string", "enum": ["declared", "runtime-elevated", "user-approved", "never"] },
-        "audit": { "type": "boolean", "description": "If true, every use is logged to the audit trail." }
+        "procedure_steps": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Ordered steps that constitute this bylaw's procedure."
+        },
+        "quorum_requirement": {
+          "type": "string",
+          "description": "Who or what count must be present for a decision to be valid."
+        },
+        "voting_method": {
+          "type": "string",
+          "description": "How votes are counted (majority, consensus, principal-decision, etc.)."
+        },
+        "amendment_procedure": {
+          "type": "string",
+          "description": "Reference to the bylaw or procedure governing how this bylaw is amended."
+        }
       }
     },
 
-    "boundary": {
+    "principle_body": {
       "type": "object",
-      "description": "Only for type=role-boundary. Hard refusal rules.",
+      "description": "Only for type=principle.",
       "additionalProperties": false,
-      "required": ["refusals"],
       "properties": {
-        "refusals": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
-        "escalate_to": { "type": "string", "description": "Ref to a supervisor persona on refusal trigger." }
+        "statement": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "rationale": { "type": "string", "maxLength": 800 },
+        "non_overridable": {
+          "type": "boolean",
+          "description": "If true, this principle cannot be relaxed by override."
+        }
       }
     },
 
-    "isolation": {
+    "mission_statement_body": {
       "type": "object",
-      "description": "Only for type=isolation-constraint. Process / network / fs isolation requirements.",
+      "description": "Only for type=mission-statement.",
       "additionalProperties": false,
+      "required": ["statement"],
       "properties": {
-        "process": { "type": "string", "enum": ["none", "subprocess", "container", "vm", "wasm"] },
-        "network": { "type": "string", "enum": ["full", "allowlist", "loopback-only", "none"] },
-        "filesystem": { "type": "string", "enum": ["full", "read-only", "scoped", "tmpfs", "none"] },
-        "scoped_paths": { "type": "array", "items": { "type": "string" } }
+        "statement": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "audience": { "type": "string", "maxLength": 200 }
+      }
+    },
+
+    "value_declaration_body": {
+      "type": "object",
+      "description": "Only for type=value-declaration.",
+      "additionalProperties": false,
+      "required": ["value", "definition"],
+      "properties": {
+        "value": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "definition": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "behavioral_indicators": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
       }
     }
   },
   "allOf": [
-    { "if": { "properties": { "type": { "const": "persona" } } }, "then": { "required": ["persona_profile"] } },
-    { "if": { "properties": { "type": { "const": "tool-definition" } } }, "then": { "required": ["tool_spec"] } },
-    { "if": { "properties": { "type": { "const": "capability-declaration" } } }, "then": { "required": ["capability"] } },
-    { "if": { "properties": { "type": { "const": "role-boundary" } } }, "then": { "required": ["boundary"] } },
-    { "if": { "properties": { "type": { "const": "isolation-constraint" } } }, "then": { "required": ["isolation"] } }
+    {
+      "if": { "properties": { "type": { "const": "charter" } } },
+      "then": { "required": ["charter_body"] }
+    },
+    {
+      "if": { "properties": { "type": { "const": "bylaw" } } },
+      "then": { "required": ["bylaw_body"] }
+    },
+    {
+      "if": { "properties": { "type": { "const": "principle" } } },
+      "then": { "required": ["principle_body"] }
+    },
+    {
+      "if": { "properties": { "type": { "const": "mission-statement" } } },
+      "then": { "required": ["mission_statement_body"] }
+    },
+    {
+      "if": { "properties": { "type": { "const": "value-declaration" } } },
+      "then": { "required": ["value_declaration_body"] }
+    }
   ]
 }

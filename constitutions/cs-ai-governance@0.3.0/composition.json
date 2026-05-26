@@ -1,0 +1,28 @@
+{
+  "schema": "https://constitution-atoms.com/schemas/composition-v1.json",
+  "type": "constitution",
+  "id": "cs-ai-governance",
+  "version": "0.3.0",
+  "name": "Convergent Systems AI Governance Constitution",
+  "description": "The complete AI governance constitution for convergent-systems-co, assembling the AI Governance Charter, Open Source Commitment Charter, and Amendment Procedure Bylaw into a ratified governance corpus. Corresponds to Constitution.md v0.3 in the aiConstitution repository.",
+  "effective_date": "2026-01-01",
+  "status": "ratified",
+  "federation": "convergent-systems.co",
+  "tags": ["governance", "ai", "convergent-systems-co", "polliard", "constitution"],
+  "charters": [
+    {
+      "ref": "constitution-atoms://atoms/charter/ai-governance",
+      "version": "0.3.0"
+    },
+    {
+      "ref": "constitution-atoms://atoms/charter/open-source-commitment",
+      "version": "1.0.0"
+    }
+  ],
+  "bylaws": [
+    {
+      "ref": "constitution-atoms://atoms/bylaw/amendment-procedure",
+      "version": "1.0.0"
+    }
+  ]
+}

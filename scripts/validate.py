@@ -2,11 +2,11 @@
 """Validate every atom, composition, and rule against its schema.
 
 Per-file checks:
-  atoms/<type>/<id>.json       → atom-v1.json; id == filename stem; type == parent dir
-  agents/<id>.json             → composition-v1.json; id == filename stem
-  rules/<type>/<id>.json       → rule-v1.json; id == filename stem; type == parent dir
+  atoms/<type>/<id>.json                      → atom-v1.json; id == filename stem; type == parent dir
+  constitutions/<id>@<version>/composition.json → composition-v1.json; id extracted from dir name
+  rules/<type>/<id>.json                      → rule-v1.json; id == filename stem; type == parent dir
 
-Composition references are resolved against the local tree; a missing or
+Composition references are resolved against the local atom tree; a missing or
 version-mismatched ref is an error.
 
 Exit 0 on full pass; exit 1 on any failure.
@@ -28,7 +28,7 @@ SCHEMAS = {
     "rule":        REPO / "schemas" / "rule-v1.json",
 }
 ATOMS_DIR        = REPO / "atoms"
-COMPOSITIONS_DIR = REPO / "agents"
+COMPOSITIONS_DIR = REPO / "constitutions"
 RULES_DIR        = REPO / "rules"
 
 
@@ -59,13 +59,17 @@ def validate_atoms(validator) -> tuple[int, dict]:
 
 
 def validate_compositions(validator, atom_index: dict) -> int:
+    """Validate constitutions/<slug>@<version>/composition.json files.
+
+    The atom's `id` is checked against the directory-name slug (before the @version).
+    """
     errors = 0
-    for path in sorted(COMPOSITIONS_DIR.glob("*.json")):
+    for path in sorted(COMPOSITIONS_DIR.rglob("composition.json")):
         rel = path.relative_to(REPO)
-        local_errors = _validate_one(path, rel, validator)
+        local_errors = _validate_composition_one(path, rel, validator)
         if not local_errors:
             data = json.loads(path.read_text(encoding="utf-8"))
-            local_errors += _resolve_refs(data, atom_index, rel)
+            local_errors += _resolve_constitution_refs(data, atom_index, rel)
         if local_errors == 0:
             print(f"✓ {rel}")
         errors += local_errors
@@ -91,6 +95,7 @@ def validate_rules(validator) -> int:
 
 
 def _validate_one(path: Path, rel: Path, validator) -> int:
+    """Validate a single atom or rule JSON file (id must match filename stem)."""
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as e:
@@ -110,15 +115,47 @@ def _validate_one(path: Path, rel: Path, validator) -> int:
     return 0
 
 
-def _resolve_refs(composition: dict, atom_index: dict, rel: Path) -> int:
+def _validate_composition_one(path: Path, rel: Path, validator) -> int:
+    """Validate a constitution composition.json file.
+
+    The composition `id` is checked against the parent directory slug
+    (the part before @version in e.g. constitutions/cs-ai-governance@0.3.0/).
+    """
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        print(f"✗ {rel}: invalid JSON ({e})")
+        return 1
+    schema_errors = list(validator.iter_errors(data))
+    if schema_errors:
+        print(f"✗ {rel}")
+        for err in schema_errors:
+            loc = "/".join(str(x) for x in err.absolute_path) or "<root>"
+            print(f"    schema: {err.message} at {loc}")
+        return len(schema_errors)
+    # id must match the slug in the parent directory name (strip @version suffix)
+    dir_name = path.parent.name
+    dir_slug = dir_name.split("@")[0]
+    if data.get("id") != dir_slug:
+        print(f"✗ {rel}")
+        print(f"    id={data.get('id')!r} does not match directory slug {dir_slug!r}")
+        return 1
+    return 0
+
+
+def _resolve_constitution_refs(composition: dict, atom_index: dict, rel: Path) -> int:
+    """Resolve all atom references in a constitution composition.
+
+    Constitution compositions carry refs under flat list keys:
+    charters, bylaws, principles, mission_statements, value_declarations.
+    """
     errors = 0
-    refs = composition.get("references", {})
+    ref_keys = ["charters", "bylaws", "principles", "mission_statements", "value_declarations"]
     flat: list[dict] = []
-    for key, value in refs.items():
+    for key in ref_keys:
+        value = composition.get(key)
         if isinstance(value, list):
             flat.extend(value)
-        elif isinstance(value, dict):
-            flat.append(value)
     for ref_obj in flat:
         target = ref_obj.get("ref")
         want_version = ref_obj.get("version")

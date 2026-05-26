@@ -1,0 +1,30 @@
+{
+  "schema": "https://constitution-atoms.com/schemas/atom-v1.json",
+  "type": "bylaw",
+  "id": "amendment-procedure",
+  "version": "1.0.0",
+  "name": "Amendment Procedure",
+  "description": "Procedure for proposing, reviewing, approving, and recording amendments to any charter, bylaw, or governance document in the convergent-systems-co ecosystem.",
+  "effective_date": "2026-01-01",
+  "status": "ratified",
+  "authority": "convergent-systems-co",
+  "supersedes": null,
+  "references": [
+    "https://github.com/convergent-systems-co/aiConstitution"
+  ],
+  "tags": ["procedure", "amendment", "governance", "convergent-systems-co"],
+  "bylaw_body": {
+    "procedure_steps": [
+      "File a GitHub issue or PR in the relevant repository describing the proposed change and its rationale. Breaking changes (rule removals or relaxations) must be tagged BREAKING.",
+      "Allow a minimum 3-business-day review window from the time the proposal is published.",
+      "The principal (Thomas Polliard) reviews the proposal and either approves, rejects with a stated reason, or requests revision.",
+      "On approval, the change is committed. The version of the amended document is bumped (patch for clarifications, minor for new provisions, major for breaking changes).",
+      "A dated changelog entry is added to the amended document recording what changed and why.",
+      "If the change involves an override of a non-overridable rule, it is rejected outright — see Constitution.md §3.5.",
+      "An override audit log entry is created at .ai/audit/overrides/<UTC>.md for any change that relaxes a rule, following the required schema in Constitution.md §5.1."
+    ],
+    "quorum_requirement": "Principal approval required. For AI-governance files (Constitution.md, Common.md, Code.md, Writing.md) the principal must provide an unambiguous explicit yes — not 'ok', not 'sure', not silence.",
+    "voting_method": "Principal decision. The principal may delegate to a named ratifier for specific domains, documented in the amendment record.",
+    "amendment_procedure": "This bylaw amends itself through the same procedure described herein, with the additional requirement that a change to the amendment procedure itself requires explicit acknowledgment of the recursive nature of the change."
+  }
+}

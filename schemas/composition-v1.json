@@ -2,32 +2,68 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://constitution-atoms.com/schemas/composition-v1.json",
   "title": "constitution-atoms v1 composition",
-  "description": "An agent composition assembling persona + tools + capabilities + role boundaries + isolation into a complete agent definition.",
+  "description": "A constitution composition assembling charter atoms, bylaw atoms, and optionally principle / mission-statement / value-declaration atoms into a complete, ratified governance corpus.",
   "type": "object",
-  "required": ["schema", "type", "id", "version", "name", "references"],
+  "required": ["schema", "type", "id", "version", "name", "charters"],
   "additionalProperties": false,
   "properties": {
     "schema": {
       "type": "string",
       "const": "https://constitution-atoms.com/schemas/composition-v1.json"
     },
-    "type": { "type": "string", "const": "agent" },
-    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$" },
+    "type": { "type": "string", "const": "constitution" },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$",
+      "description": "Slug that matches the parent directory name (minus the @version suffix)."
+    },
     "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$" },
-    "name": { "type": "string", "minLength": 1, "maxLength": 80 },
-    "description": { "type": "string", "maxLength": 500 },
-    "tags": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 40 }, "uniqueItems": true },
-    "references": {
-      "type": "object",
-      "required": ["persona", "isolation"],
-      "additionalProperties": false,
-      "properties": {
-        "persona":         { "$ref": "#/$defs/ref" },
-        "tools":           { "type": "array", "items": { "$ref": "#/$defs/ref" }, "uniqueItems": true },
-        "capabilities":    { "type": "array", "items": { "$ref": "#/$defs/ref" }, "uniqueItems": true },
-        "role_boundaries": { "type": "array", "items": { "$ref": "#/$defs/ref" }, "uniqueItems": true },
-        "isolation":       { "$ref": "#/$defs/ref" }
-      }
+    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "description": { "type": "string", "maxLength": 800 },
+    "effective_date": { "type": "string", "format": "date" },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "ratified", "amended", "superseded"]
+    },
+    "federation": {
+      "type": "string",
+      "description": "Federation domain this constitution is published under."
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 60 },
+      "uniqueItems": true
+    },
+    "charters": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ref" },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Charter atoms that form the foundational law of this constitution. At least one required."
+    },
+    "bylaws": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ref" },
+      "uniqueItems": true,
+      "description": "Bylaw atoms that specify procedures, quorum rules, and voting methods."
+    },
+    "principles": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ref" },
+      "uniqueItems": true,
+      "description": "Principle atoms that articulate non-negotiable operating principles."
+    },
+    "mission_statements": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ref" },
+      "uniqueItems": true,
+      "description": "Mission-statement atoms included in this constitution."
+    },
+    "value_declarations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ref" },
+      "uniqueItems": true,
+      "description": "Value-declaration atoms included in this constitution."
     }
   },
   "$defs": {
@@ -36,8 +72,15 @@
       "required": ["ref", "version"],
       "additionalProperties": false,
       "properties": {
-        "ref":     { "type": "string", "pattern": "^constitution-atoms://atoms/[a-z-]+/[a-z0-9-]+$" },
-        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$" }
+        "ref": {
+          "type": "string",
+          "pattern": "^constitution-atoms://atoms/[a-z-]+/[a-z0-9-]+$",
+          "description": "Atom URI: constitution-atoms://atoms/<type>/<id>"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$"
+        }
       }
     }
   }

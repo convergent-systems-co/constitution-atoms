@@ -1,0 +1,43 @@
+{
+  "schema": "https://constitution-atoms.com/schemas/atom-v1.json",
+  "type": "charter",
+  "id": "open-source-commitment",
+  "version": "1.0.0",
+  "name": "Open Source Commitment Charter",
+  "description": "Charter committing all convergent-systems-co *-atoms catalog work to Apache-2.0 (code) and CC-BY-4.0 (data) licensing, with no proprietary dependencies in the critical path.",
+  "effective_date": "2026-01-01",
+  "status": "ratified",
+  "authority": "convergent-systems-co",
+  "supersedes": null,
+  "references": [
+    "https://spdx.org/licenses/Apache-2.0.html",
+    "https://creativecommons.org/licenses/by/4.0/"
+  ],
+  "tags": ["open-source", "licensing", "apache", "cc-by", "convergent-systems-co"],
+  "charter_body": {
+    "mission": "Ensure every artifact produced under the convergent-systems-co *-atoms ecosystem is permanently and unambiguously open — readable, forkable, and remixable by anyone.",
+    "vision": "A governance and AI-tooling ecosystem with no proprietary lock-in at any layer — from schemas to atom content to tooling.",
+    "scope": "All code, data, schemas, and documentation in repositories under the convergent-systems-co GitHub organization that conform to the atoms-spec.",
+    "core_values": [
+      "Openness — source is always available, always forkable",
+      "Attribution — contributors and sources are credited",
+      "Compatibility — chosen licenses are OSI-approved and interoperable with downstream commercial use",
+      "Durability — license terms outlast any individual contributor or organization"
+    ],
+    "operating_principles": [
+      "All code (scripts, schemas, tooling, CI workflows) is licensed Apache-2.0",
+      "All data (atom content, composition definitions, catalog exports) is licensed CC-BY-4.0",
+      "No proprietary dependencies in the critical path of any catalog or composition consumer",
+      "Community contributions are welcomed under the same dual-license terms",
+      "License headers must be preserved when copying within-license; they must not be stripped"
+    ],
+    "provisions": [
+      "Every repository in the convergent-systems-co *-atoms ecosystem MUST carry a LICENSE file (Apache-2.0) and a LICENSE-data file (CC-BY-4.0).",
+      "The ATOMS.yml manifest MUST declare licensing.code and licensing.data fields.",
+      "Dependency licenses MUST be reviewed before introduction. GPL/AGPL dependencies in commercial contexts require explicit principal approval.",
+      "Generated exports (catalog.json, manifest.json) inherit the CC-BY-4.0 license of the atom content they represent.",
+      "Any fork or derivative work MUST retain attribution to convergent-systems-co as the upstream source.",
+      "This charter may be amended only through the amendment procedure bylaw with a version bump and dated changelog entry."
+    ]
+  }
+}
